@@ -8,11 +8,14 @@ typing_extensions==4.15.0
 
 urllib3==2.5.0
 programas a instalar 
-# Para Meshtastic (comunicación mesh)
+# Para Meshtastic 
 pip install meshtastic
 
-# Para Cryptography (encriptación)
+# Para Cryptography 
 pip install cryptography
 
-# Para Paho-MQTT (cliente MQTT)
+# Para Paho-MQTT 
 pip install paho-mqtt
+
+Los csv y json deben estar en la misma carpeta que el main
+los .py en una carpeta que se llame src
