@@ -1,0 +1,10 @@
+
+2025-10-15 15:47:45,Manuel:alguien conectado?
+2025-10-16 10:10:13,Alejandro:popo
+2025-10-16 10:10:49,Aitor:Ya funciona el envio de coordenadas, envio una lista de diccionarios, estilo [{x,y,z}], si Z no existe no se pide y no se envia
+2025-10-16 10:12:20,GPS_Externo:Aitor, define que es cada una, es: [“robot":{()}, “arm":{()}]
+2025-10-18 15:48:25,Manuel:hquien es el que acaba de mandar posicion?
+2025-10-18 15:49:12,Jaime1:Quien eres?
+2025-10-18 15:49:38,Manuel:soy manu
+2025-10-18 15:50:14,Manuel:preguntaba porque hay alguien que mandaba coordenadas que no tengo agregado y para ponerle nombre 
+2025-10-18 15:55:42,Manuel:jaime una cosa los sensores estan operativos que queria hacer una foto de como recibo los mensajes pero hoy no los recibo?
