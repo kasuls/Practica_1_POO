@@ -1,0 +1,21 @@
+{
+    "debug":"True",
+    "auto_reconnect":"True",
+    "auto_reconnect_delay": 1,
+    "print_service_envelope":"False",
+    "print_message_packet": "False",
+
+    "self.dispositivo": "dispositivo",
+    "mqtt_broker": "mqtt.meshtastic.org",
+    "mqtt_port": 1883,
+    "mqtt_username": "meshdev",
+    "mqtt_password": "large4cats",
+
+    "root_topic": "msh/EU_868/ES/2/e/",
+    "channel" : "TestMQTT",
+    "key": "ymACgCy9Tdb8jHbLxUxZ/4ADX+BWLOGVihmKHcHTVyo=",
+
+    "BROKER":"broker.emqx.io",
+    "PORT": 1883,
+    "TOPICS" : ["sensor/data/sen55", "sensor/data/gas_sensor"]
+}
