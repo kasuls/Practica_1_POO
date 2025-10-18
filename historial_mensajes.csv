@@ -1,0 +1,36 @@
+
+2025-10-15 15:47:45,Manuel:alguien conectado?
+2025-10-16 10:10:13,Alejandro:popo
+2025-10-16 10:10:49,Aitor:Ya funciona el envio de coordenadas, envio una lista de diccionarios, estilo [{x,y,z}], si Z no existe no se pide y no se envia
+2025-10-16 10:12:20,GPS_Externo:Aitor, define que es cada una, es: [“robot":{()}, “arm":{()}]
+2025-10-18 15:48:25,Manuel:hquien es el que acaba de mandar posicion?
+2025-10-18 15:49:12,Jaime1:Quien eres?
+2025-10-18 15:49:38,Manuel:soy manu
+2025-10-18 15:50:14,Manuel:preguntaba porque hay alguien que mandaba coordenadas que no tengo agregado y para ponerle nombre 
+2025-10-18 15:55:42,Manuel:jaime una cosa los sensores estan operativos que queria hacer una foto de como recibo los mensajes pero hoy no los recibo?
+2025-10-18 16:37:40,Manuel:se recibe este mensaje?
+2025-10-18 16:57:07,Alejandro:Hola, estoy conectado
+2025-10-18 16:57:16,Alejandro:ds
+2025-10-18 16:57:20,Manuel:lo recibo
+2025-10-18 17:17:37,Manuel:hola alex
+2025-10-18 17:17:48,Manuel:todo en orden 
+2025-10-18 17:17:52,Alejandro:hola manuu
+2025-10-18 19:06:29,Manuel:guada estoy en la cafeteria cuanto te queda?
+2025-10-18 19:07:06,Alejandro:Estoy todavia en mi casa ahora voy para allá
+2025-10-18 19:07:43,Manuel:si no vienes te quedas sin tarta de queso
+2025-10-18 19:09:37,Manuel:nop
+2025-10-18 19:56:01,Manuel:2
+2025-10-18 19:58:04,Alejandro:Hola, estoy conectado
+2025-10-18 19:58:17,Alejandro:Ya me comi la tarta de queso
+2025-10-18 19:59:05,Alejandro:rf3
+2025-10-18 19:59:30,Alejandro:Hola, estoy conectado
+2025-10-18 20:47:30,2882363145:y tu quien eres
+2025-10-18 20:47:32,Manuel:hola hay alguien?
+2025-10-18 20:47:36,Alejandro:Hola, estoy conectado
+2025-10-18 20:47:43,jaime2:Esther cambia pon tu nombre y tus iniciales 
+2025-10-18 20:48:01,jaime2:Así sabemos quienes estarán 
+2025-10-18 20:48:47,2882363145:donde tengo que poner nombre e iniciales?
+2025-10-18 20:50:28,esther:jaja claro
+2025-10-18 20:50:39,jaime2:En la variable client_short_name las iniciales 
+2025-10-18 20:51:04,jaime2:Y en client_long_ñame tu nombre
+2025-10-18 20:52:04,esther:lo acabo de cambiar
