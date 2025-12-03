@@ -1,13 +1,15 @@
 
 from meshtastic import BROADCAST_NUM
 import time
+import threading
 
 class menu:
-    def __init__(self, dispositivo, comunicador, recibir_mensajes, sensor):
+    def __init__(self, dispositivo, comunicador, recibir_mensajes, sensor,doom_exe):
         self.dispositivo = dispositivo
         self.comunicador = comunicador
         self.recibir_mensajes = recibir_mensajes
         self.sensor = sensor
+        self.doom = doom_exe
 
     
     def funcionamiento(self):   
@@ -26,7 +28,8 @@ class menu:
                 print("3. Ver historial")
                 print("4. Ver sensores")  
                 print("5. Ver historial sensores")
-                print("6. Salir")
+                print("6.doom")
+                print("7. Salir")
                 
                 opcion = input("elija una opcion")
                 
@@ -53,8 +56,15 @@ class menu:
 
                 elif opcion == "5":
                     self.sensor.historial_sensores()  # Mostrar historial de sensores
-
+                
                 elif opcion == "6":
+                    self.doom.client.loop_start()   
+                    print("Cliente DOOM esperando conexión...")
+                    time.sleep(1)
+                    self.doom.correr_doom()
+                    self.doom.transmitir_ventana()
+                    
+                elif opcion == "7":
                     print("Saliendo...")
                     break
                     

@@ -1,25 +1,105 @@
 from meshtastic.protobuf import mesh_pb2, mqtt_pb2, portnums_pb2
 from meshtastic import BROADCAST_NUM, protocols
 import paho.mqtt.client as mqtt
-import random
 import time
-import ssl
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 import base64
 import re
 
+from abc import ABC, abstractmethod
 
-class recibir_mensajes:
-    def __init__(self, dispositivo, comunicador):
+class plantilla(ABC):
+    def __init__(self):
+        pass
+    @abstractmethod
+    def procesar(self, dispositivo, msq, remitente):
+        pass
+
+class guardar_texto(plantilla):
+    def __init__(self,interfaz):
+        self.interfaz = interfaz
+        self.mensaje = ""   
+    def procesar(self, dispositivo, msq, remitente):
+        try:
+            payload_str = msq.decoded.payload.decode('utf-8', errors='ignore')
+            nombre_largo = remitente
+
+            self.mensaje = f"{nombre_largo}: {payload_str}"
+            print(f"Mensaje de {nombre_largo}: {payload_str}")
+
+            with open('historial_mensajes.csv', 'a', encoding='utf-8') as archivo:
+                archivo.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')},{self.mensaje}\n")
+
+            dispositivo.agregar_mensaje("Texto", payload_str, remitente)
+        except Exception as e:
+            return None
+
+class guardar_posicion(plantilla):
+    def __init__(self,interfaz):
+        self.interfaz = interfaz
+        self.mensaje = ""
+    def procesar(self, dispositivo, msq, remitente):
+        try:
+            position = mesh_pb2.Position()
+            position.ParseFromString(msq.decoded.payload)
+
+            lat = position.latitude_i
+            lon = position.longitude_i
+            alt = position.altitude
+
+            contenido = {'x': lat, 'y': lon, 'z': alt}
+            self.mensaje = f"{remitente}: {contenido}"
+
+            with open('historial_coordenadas.csv', 'a', encoding='utf-8') as archivo:
+                archivo.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')},{remitente}:{contenido}\n")
+
+            dispositivo.agregar_mensaje("Posición", contenido, remitente)
+
+        except Exception:
+            return None
+
+class guardar_nodo(plantilla):
+    def __init__(self,interfaz):
+        self.interfaz = interfaz
+        self.mensaje = ""
+    def procesar(self, dispositivo, msq, remitente):
+        try:
+            usuario_info = mesh_pb2.User()
+            usuario_info.ParseFromString(msq.decoded.payload)
+
+            contenido = {
+                'id': usuario_info.id,
+                'nombre_largo': usuario_info.long_name
+            }
+
+            self.mensaje = f"{usuario_info.long_name}: {contenido}"
+            print(f"Info Nodo de {contenido}")
+
+            with open('historial_nodos.csv', 'a', encoding='utf-8') as archivo:
+                archivo.write(f"{contenido}\n")
+
+            dispositivo.agregar_mensaje("Info Nodo", contenido, remitente)
+
+        except Exception:
+            return None
+
+
+
+class recibir_mensajes():
+    def __init__(self, dispositivo, comunicador,interfaz):
         self.dispositivo = dispositivo
         self.comunicador = comunicador
-        # Copiar atributos del comunicador
+        self.interfaz = interfaz
         self.print_service_envelope = comunicador.print_service_envelope
         self.print_message_packet = comunicador.print_message_packet
         self.debug = comunicador.debug
-        self.key = comunicador.key  # ✅ Añadir esta línea
+        self.key = comunicador.key  
 
+        self.guardar_texto = guardar_texto(interfaz)
+        self.guardar_posicion = guardar_posicion(interfaz)
+        self.guardar_nodo = guardar_nodo(interfaz)
+       
     def on_message(self, client, userdata, msg):
         se = mqtt_pb2.ServiceEnvelope()
         try:
@@ -57,6 +137,7 @@ class recibir_mensajes:
         #print(mp)
         
         self.guardar_datos(self.dispositivo, mp)
+        
 
     def decode_encrypted(self, mp):
         try:
@@ -76,15 +157,42 @@ class recibir_mensajes:
             if self.debug: 
                 print(f"*** Decryption failed: {str(e)}")
             return
-
-    def guardar_datos(self, dispositivo, msq):
         
-        remitente_id = str(getattr(msq, 'from', 'Desconocido'))
-        if remitente_id in dispositivo.nombres:
-            remitente = dispositivo.nombres[remitente_id]
+    def mostrar_en_interfaz(self, mensaje):
+        if self.interfaz and hasattr(self.interfaz, 'mostrar_en_interfaz'):
+            self.interfaz.mostrar_en_interfaz(mensaje)
         else:
-            remitente = remitente_id
- 
+            print(mensaje) 
+   
+    def guardar_datos(self, dispositivo, msq):
+
+        remitente_id = str(getattr(msq, 'from', 'Desconocido'))
+        remitente = dispositivo.nombres.get(remitente_id, remitente_id)
+
+        if not msq.HasField("decoded"):
+            dispositivo.agregar_mensaje("Cifrado", "No legible", remitente)
+            return
+
+        port = msq.decoded.portnum
+
+        if port == portnums_pb2.TEXT_MESSAGE_APP:
+            self.guardar_texto.procesar(dispositivo, msq, remitente)
+            self.mostrar_en_interfaz(self.guardar_texto.mensaje)
+        elif port == portnums_pb2.POSITION_APP:
+            self.guardar_posicion.procesar(dispositivo, msq, remitente)
+            self.mostrar_en_interfaz(self.guardar_posicion.mensaje)
+        elif port == portnums_pb2.NODEINFO_APP:
+            self.guardar_nodo.procesar(dispositivo, msq, remitente)
+            self.mostrar_en_interfaz(self.guardar_nodo.mensaje)
+            
+        else:
+            payload_str = msq.decoded.payload.decode('utf-8', errors='ignore')
+            dispositivo.agregar_mensaje(f"Tipo {port}", payload_str, remitente)
+
+        
+
+        
+        """""""""
         if msq.HasField("decoded"):
             payload_str = msq.decoded.payload.decode('utf-8', errors='ignore')
             
@@ -93,6 +201,8 @@ class recibir_mensajes:
                 contenido = payload_str
                 nombre_largo = remitente # Por defecto
                 print(f"Mensaje de {nombre_largo}: {contenido}")
+                mensaje = f"{nombre_largo}: {contenido}"
+                self.mostrar_en_interfaz(mensaje)
                 with open('historial_mensajes.csv', 'a', encoding='utf-8') as archivo:
                     archivo.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')},{nombre_largo}:{contenido}\n")
                 
@@ -104,10 +214,12 @@ class recibir_mensajes:
                     
                     lat = position.latitude_i  
                     lon = position.longitude_i
-                    alt = position.altitude
+                    alt = position
                     
                     contenido = {'x': lat, 'y': lon, 'z': alt} 
                     print(f"Posición de {remitente}: {contenido}")
+                    mensaje_pos = f"{nombre_largo}: {contenido}"
+                    self.mostrar_en_interfaz(mensaje_pos)
                     with open('historial_coordenadas.csv', 'a', encoding='utf-8') as archivo:
                         archivo.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')},{remitente}:{contenido}\n")
 
@@ -123,6 +235,8 @@ class recibir_mensajes:
                     nombre_largo = usuario_info.long_name
                     contenido = {'id': id, 'nombre_largo': nombre_largo}
                     print(f"Info Nodo de {contenido}") 
+                    mensaje_nodo = f"{nombre_largo}: {contenido}"
+                    self.mostrar_en_interfaz(mensaje_nodo)
                     with open('historial_nodos.csv', 'a', encoding='utf-8') as archivo:
                         archivo.write(f"{contenido}\n")
                 except Exception as e:
@@ -136,7 +250,8 @@ class recibir_mensajes:
             contenido = "No legible"
         
         dispositivo.agregar_mensaje(tipo, contenido, remitente)
-
+        """""""""
+       
     #def guardar_csv(self, dispositivo):
        # with open('historial_mensajes.csv', 'a', encoding='utf-8') as archivo:
         #    for mensaje in dispositivo.historial_mensajes:

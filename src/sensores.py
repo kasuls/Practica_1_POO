@@ -2,7 +2,7 @@ import json
 import paho.mqtt.client as mqtt
 
 class Sensor:
-    def __init__(self):
+    def __init__(self,interfaz):
         with open("static/variables.json", "r") as f:
             config = json.load(f)
         self.BROKER = config["BROKER"]  # Cambia esto por tu broker MQTT
@@ -12,11 +12,12 @@ class Sensor:
         self.client = mqtt.Client()
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
-        
+        self.interfaz = interfaz
         self.historial = {
             "sen55": [],
             "gas_sensor": []
         }
+        self.escuchando = False
     
     # conectar no tocar
     def on_connect(self,client, userdata, flags, rc):
@@ -29,6 +30,12 @@ class Sensor:
         else:
             print(f"Error de conexión, código: {rc}")
 
+    def mostrar_en_interfaz(self, mensaje):
+        if self.interfaz and hasattr(self.interfaz, 'mostrar_en_interfaz'):
+            self.interfaz.mostrar_en_interfaz(f"{mensaje}\n")
+        else:
+            print(mensaje)
+
     # recibir mensajes
     def on_message(self,client, userdata, msg):
         print(f"Mensaje recibido en el tema '{msg.topic}':")
@@ -37,7 +44,9 @@ class Sensor:
         try:
             # Decodificar y convertir el mensaje de JSON a diccionario
             payload = json.loads(msg.payload.decode("utf-8"))
-            print(json.dumps(payload, indent=4))  # Mostrar el mensaje formateado
+            print(json.dumps(payload, indent=4))
+            mensaje = json.dumps(payload, indent=4)
+            self.mostrar_en_interfaz(mensaje)  # Mostrar el mensaje formateado
             if msg.topic == "sensor/data/sen55":
                 self.historial["sen55"].append(payload)
                 with open("sen55_data.json", "a") as f:
@@ -55,12 +64,34 @@ class Sensor:
     # Mostrar historial de sensores
     def historial_sensores(self):
         print("Historial de datos del sensor SEN55:")
-        for entry in self.historial["sen55"]:
-            print(json.dumps(entry, indent=4))
+        for datos in self.historial["sen55"]:
+            self.mostrar_en_interfaz(datos)
+            print(json.dumps(datos, indent=4))
         
         print("\nHistorial de datos del sensor de gas:")
-        for entry in self.historial["gas_sensor"]:
-            print(json.dumps(entry, indent=4))
+        for datos in self.historial["gas_sensor"]:
+            self.mostrar_en_interfaz(datos)
+            print(json.dumps(datos, indent=4))
+            
+    def iniciar_escucha(self):
+        if not self.escuchando:
+            try:
+                self.client.connect(self.BROKER, self.PORT, 60)
+                self.client.loop_start()
+                self.escuchando = True
+                return True
+            except Exception as e:
+                print(f"Error al conectar: {e}")
+                return False
+        return True
+    
+    def detener_escucha(self):
+        if self.escuchando:
+            self.client.loop_stop()
+            self.client.disconnect()
+            self.escuchando = False
+            return True
+        return False
 
 
 

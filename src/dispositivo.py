@@ -1,17 +1,41 @@
-from meshtastic.protobuf import mesh_pb2, mqtt_pb2, portnums_pb2
-from meshtastic import BROADCAST_NUM, protocols
-import paho.mqtt.client as mqtt
 import random
 import time
-import ssl
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from cryptography.hazmat.backends import default_backend
-import base64
-import re
+from abc import ABC, abstractmethod
+from typing import Generic, TypeVar, List
 
-class Dispositivo:
+T = TypeVar('T')
+
+class plantilla_dispositivo(Generic[T]):
     def __init__(self):
+        self.client_short_name = ""
+        self.client_long_name = ""
+        self.historial_mensajes: List[T] = []  
+        self.nodos_conectados = {}
+        self.nombres = {}
+        self.lat = ''
+        self.lon = ''
+        self.alt = ''
+        self.protocolo = ''
 
+    @abstractmethod
+    def agregar_mensaje(self, tipo, contenido: T, remitente, timestamp=None):
+        pass
+
+    @abstractmethod
+    def mostrar_historial(self):
+        pass
+
+    @abstractmethod
+    def mostrar_nodos_conectados(self):
+        pass
+
+    @abstractmethod
+    def mostrar_posicion(self):
+        pass
+
+class Dispositivo(plantilla_dispositivo[dict]):
+    def __init__(self):
+        super().__init__()
         # Genera cosas no tocar
         random_hex_chars = '6d61'
         node_name = '!abcd' + random_hex_chars
@@ -45,7 +69,8 @@ class Dispositivo:
             '2882347680': 'Aitor', 
             '719928777': 'Jaime1',
             '2925567208': 'jaime2',
-            '2882363145': 'esther'
+            '2882363145': 'esther',
+            '2882380738': 'isabel'
         }
     
     # Añadir mensaje al historial

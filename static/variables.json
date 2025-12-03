@@ -14,7 +14,8 @@
     "root_topic": "msh/EU_868/ES/2/e/",
     "channel" : "TestMQTT",
     "key": "ymACgCy9Tdb8jHbLxUxZ/4ADX+BWLOGVihmKHcHTVyo=",
-
+    "chanel_doom":"doom",
+    "key_doom":"S0wlpFssCa/B8dxfwNfZQ+z1gEyHADYCmaV1QzVoEbY=",
     "BROKER":"broker.emqx.io",
     "PORT": 1883,
     "TOPICS" : ["sensor/data/sen55", "sensor/data/gas_sensor"]

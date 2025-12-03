@@ -10,8 +10,10 @@ import base64
 import re
 import json
 
+
+
 class comunicador:
-    def __init__(self,dispositivo):
+    def __init__(self,dispositivo,doom_exe):
 
         with open("static/variables.json", "r") as f:
             config = json.load(f)
@@ -22,6 +24,7 @@ class comunicador:
         self.print_message_packet = config["print_message_packet"]
 
         self.dispositivo = dispositivo
+        self.doom = doom_exe
         self.mqtt_broker = config["mqtt_broker"]
         self.mqtt_port = config["mqtt_port"]
         self.mqtt_username = config["mqtt_username"]    
@@ -30,6 +33,8 @@ class comunicador:
         self.root_topic = config["root_topic"]
         self.channel = config["channel"]
         self.key = config["key"]
+        self.channel_doom = config["chanel_doom"]
+        self.key_doom = config["key_doom"]
         
         self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id="", clean_session=True, userdata=None)
         self.client.on_connect = self.on_connect
@@ -243,5 +248,4 @@ class comunicador:
         encoded_message.payload = b"\030\000"
         self.generate_mesh_packet(destination_id, encoded_message)
     
-
-    
+  
