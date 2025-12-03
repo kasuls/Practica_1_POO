@@ -1,8 +1,31 @@
-pycparser==2.23
-Pypubsub==4.0.3
-pyserial==3.5
-PyYAML==6.0.2
-requests==2.32.5
-tabulate==0.9.0
-typing_extensions==4.15.0
-urllib3==2.5.0
+# Dependencias principales
+meshtastic==2.3.5
+paho-mqtt==1.6.1
+pycryptodome==3.20.0
+cryptography==42.0.8
+
+# Interfaz gráfica
+tkintermapview==1.22
+pygame==2.5.2
+pygetwindow==0.0.9
+pyautogui==0.9.54
+
+# Procesamiento de imágenes y video
+opencv-python==4.9.0.80
+numpy==1.26.4
+Pillow==10.2.0
+
+# Utilidades
+protobuf==4.25.3
+
+# Dependencias básicas
+pip install meshtastic paho-mqtt cryptography
+
+# Dependencias para DOOM
+pip install opencv-python pygame pygetwindow pyautogui numpy
+
+# Dependencias para interfaz gráfica
+pip install tkintermapview Pillow
+
+# Dependencias protobuf
+pip install protobuf
