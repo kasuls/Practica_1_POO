@@ -17,5 +17,8 @@ pip install cryptography
 # Para Paho-MQTT 
 pip install paho-mqtt
 
+
 Los csv y json deben estar en la misma carpeta que el main
 los .py en una carpeta que se llame src
+cliente_doom.py es independiente
+
